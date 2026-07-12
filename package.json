@@ -1,0 +1,9 @@
+{
+  "name": "fei",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @fei/web dev",
+    "build": "pnpm --filter @fei/web build",
+    "typecheck": "pnpm --filter @fei/web typecheck"
+  }
+}
