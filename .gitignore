@@ -3,3 +3,12 @@ dist/
 .DS_Store
 .playwright-mcp/
 .venv/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+tfplan
+plan_output.txt
