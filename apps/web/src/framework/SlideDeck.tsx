@@ -56,11 +56,22 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
 
   return (
     <div
-      className="relative h-screen w-screen overflow-hidden"
+      className="relative h-screen w-screen overflow-hidden bg-background font-heading text-foreground"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       {slides[index]}
+
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-border">
+        <div
+          className="h-full bg-accent transition-[width] duration-300"
+          style={{ width: `${((index + 1) / slides.length) * 100}%` }}
+        />
+      </div>
+
+      <div className="absolute right-6 bottom-6 font-mono text-xs text-muted-foreground">
+        {String(index + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+      </div>
     </div>
   );
 }

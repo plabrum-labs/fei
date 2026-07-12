@@ -7,9 +7,11 @@ export interface FigureProps {
 
 export function Figure({ caption, children }: FigureProps) {
   return (
-    <figure className="my-6">
+    <figure className="my-10">
       {children}
-      <figcaption className="mt-2 text-sm text-gray-500">{caption}</figcaption>
+      <figcaption className="mt-3 text-center font-mono text-xs text-muted-foreground">
+        {caption}
+      </figcaption>
     </figure>
   );
 }

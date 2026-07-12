@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { discoverLectures } from "@/framework/discoverLectures";
+import { HomePage } from "@/pages/Home";
 import { LecturePage } from "@/pages/LecturePage";
 import { SlideDeckPage } from "@/pages/SlideDeckPage";
 
@@ -9,28 +10,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <main className="mx-auto max-w-3xl px-4 py-12">
-              <h1 className="text-3xl font-bold text-blue-600">fei</h1>
-              <ul>
-                {lectures.map((lecture) => (
-                  <li key={lecture.path}>
-                    <Link to={`/${lecture.path}`}>{lecture.path}</Link>
-                  </li>
-                ))}
-              </ul>
-            </main>
-          }
-        />
-        {lectures.map((lecture) => (
-          <Route
-            key={lecture.path}
-            path={`/${lecture.path}`}
-            element={<LecturePage lecture={lecture} />}
-          />
-        ))}
+        <Route path="/" element={<HomePage lectures={lectures} />} />
+        {lectures
+          .filter((lecture) => lecture.loadArticle)
+          .map((lecture) => (
+            <Route
+              key={lecture.path}
+              path={`/${lecture.path}`}
+              element={<LecturePage lecture={lecture} />}
+            />
+          ))}
         {lectures
           .filter((lecture) => lecture.loadSlides)
           .map((lecture) => (
