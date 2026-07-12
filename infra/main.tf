@@ -26,9 +26,9 @@ module "pages" {
   production_branch = var.production_branch
   github_owner      = var.github_owner
   github_repo_name  = var.github_repo_name
-  root_directory   = "apps/web"
-  build_command    = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @fei/web build"
-  destination_dir  = "dist"
+  root_directory    = "apps/web"
+  build_command     = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @fei/web build"
+  destination_dir   = "dist"
 
   domains = ["fei.plabrum.com"]
 }
