@@ -33,6 +33,17 @@ module "pages" {
   domains = ["fei.plabrum.com"]
 }
 
+# Cloudflare Pages doesn't auto-create the custom domain's DNS record via API
+# (only via the dashboard flow) - scoped to just this one record, not the zone.
+resource "cloudflare_record" "fei" {
+  zone_id = var.cloudflare_zone_id
+  name    = "fei"
+  type    = "CNAME"
+  content = module.pages.subdomain
+  ttl     = 1 # automatic (required when proxied)
+  proxied = true
+}
+
 output "pages_project_name" {
   value = module.pages.project_name
 }

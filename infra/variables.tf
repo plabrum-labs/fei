@@ -27,3 +27,9 @@ variable "production_branch" {
   type        = string
   default     = "main"
 }
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare zone ID for plabrum.com - only used for the fei DNS record, not the rest of the zone"
+  type        = string
+  default     = "7fedab7551876c0be5a98385f1042460"
+}
