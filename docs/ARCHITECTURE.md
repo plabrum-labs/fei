@@ -1,6 +1,6 @@
 # Architecture Plan
 
-Planning doc for the `fei` platform. See `README.md` (or the seminar vision doc) for the
+Planning doc for the `fei` platform. See `README.md` (or the project vision doc) for the
 educational goals — this covers the technical shape only.
 
 ## Frontend
@@ -27,6 +27,15 @@ inline experimentation).
 **Open question:** true Distill-grade widgets are expensive per paragraph. Proposed but
 not yet confirmed: a 90/10 split — one or two load-bearing inline widgets per lecture at
 real Distill quality, everything else is prose + static data figures.
+
+## Scope and pacing
+
+This is Philip's self-directed, open-ended independent study — not a fixed-length
+seminar. There is no month/week schedule; papers are pulled in and lectures built in
+whatever order makes sense as the study progresses. The lab-based top-level folders
+(`gershman/`, `tenenbaum/`, `friston/`, `hafner/`) still organize content by research
+philosophy, but `lab.json`'s `order` field is display ordering only, not a pacing
+commitment.
 
 ## Shared widget/component library
 
@@ -72,8 +81,9 @@ of that need.
 
 ## Project folder structure
 
-Organized by researcher/lab, then by paper, then forked into `reproduction/` (research
-code) vs `presentation/` (everything the frontend renders). Both live in this same repo —
+Organized by researcher/lab, then by paper, then forked into `reproduction/` (faithful
+research code), `extensions/` (new research directions inspired by the paper), and
+`presentation/` (everything the frontend renders). All live in this same repo —
 not split across repos — with the folder boundary doing the decoupling work instead:
 nothing in `apps/web` imports from `reproduction/`, and nothing in `reproduction/` imports
 React. The only handoff between the two is a precomputed JSON file.
@@ -90,8 +100,10 @@ fei/
 │   │   ├── reproduction/
 │   │   │   ├── README.md
 │   │   │   ├── src/                    # the actual reimplementation
-│   │   │   ├── notebooks/
 │   │   │   └── generate_results.py     # writes ../presentation/data/results.json
+│   │   ├── extensions/                  # original projects motivated by the paper
+│   │   │   └── project-name/
+│   │   │       └── spec.md
 │   │   └── presentation/
 │   │       ├── article.mdx
 │   │       ├── slides.mdx
@@ -118,13 +130,39 @@ fei/
 │   └── api/
 │
 ├── scripts/                            # repo-wide tooling (e.g. pdf_to_markdown.py)
-├── pyproject.toml / uv.lock            # env for the Python tooling in scripts/
+├── pyproject.toml / uv.lock            # env for scripts/ + repo-wide dev tools (ruff, basedpyright)
+├── pyrightconfig.json                  # type-checking config, shared across all Python code
 └── package.json                        # workspace root (apps/web, apps/api)
 ```
 
 `apps/web` discovers papers by convention — globbing `*/*/presentation/article.mdx` and
 `*/*/presentation/slides.mdx` — so adding a new lecture is "add a folder in the right
 shape," never "edit the framework."
+
+### Python: per-paper lockfiles, one shared lint/type-check config
+
+Each paper's `reproduction/` gets its own `uv` project (`pyproject.toml` + `uv.lock` +
+`.venv`) when it needs Python dependencies — `uv init --no-workspace` inside that
+`reproduction/` folder, then `uv add` whatever the reimplementation needs. This keeps one
+paper's dependency footprint (e.g. `numpy`/`torch`) from bleeding into another's lockfile.
+The root `pyproject.toml` only carries `pymupdf` (for `scripts/pdf_to_markdown.py`) plus
+the repo-wide dev tools, `ruff` and `basedpyright`.
+
+Ruff needs no per-project config since it doesn't resolve imports. Basedpyright does, so
+the root `pyrightconfig.json` lists an `executionEnvironments` entry per paper project,
+pointing `extraPaths` at that project's own venv `site-packages` (pyright's
+`executionEnvironments` don't support a per-entry `venv` override, only `extraPaths`):
+
+```json
+{
+  "root": "gershman/01-neural-evidence-strategy-reuse/reproduction",
+  "extraPaths": ["gershman/01-neural-evidence-strategy-reuse/reproduction/.venv/lib/python3.13/site-packages"]
+}
+```
+
+When a new paper's `reproduction/` gets its own `uv` project, add a matching entry here —
+otherwise basedpyright falls back to the root `.venv` and reports the paper's imports
+(numpy, torch, etc.) as unresolved.
 
 ## Rejected paths (kept for context, not to re-litigate)
 

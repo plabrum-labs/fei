@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "preserveSymlinks": true,
+    "paths": {
+      "@/*": ["./apps/web/src/*"],
+      "@content/*": ["./*"],
+      "*": ["./apps/web/node_modules/@types/*", "./apps/web/node_modules/*"]
+    }
+  },
+  "include": [
+    "apps/web/src/vite-env.d.ts",
+    "friston/**/presentation/**/*.ts",
+    "friston/**/presentation/**/*.tsx",
+    "gershman/**/presentation/**/*.ts",
+    "gershman/**/presentation/**/*.tsx",
+    "hafner/**/presentation/**/*.ts",
+    "hafner/**/presentation/**/*.tsx",
+    "tenenbaum/**/presentation/**/*.ts",
+    "tenenbaum/**/presentation/**/*.tsx"
+  ]
+}

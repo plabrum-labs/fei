@@ -5,3 +5,21 @@ requires-python = ">=3.13"
 dependencies = [
     "pymupdf>=1.28.0",
 ]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.39.9",
+    "ruff>=0.15.21",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-exclude = ["apps/web", "**/.venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ANN"]
+ignore = ["ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["ANN"]

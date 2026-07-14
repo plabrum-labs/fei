@@ -20,7 +20,7 @@ export function LecturePage({ lecture }: { lecture: LectureEntry }) {
           ← Foundations of Efficient Intelligence
         </Link>
         <p className="mt-6 font-mono text-xs tracking-[0.2em] text-accent uppercase">
-          {lab ? `${lab.month} · ${lab.title}` : titleCase(lecture.lab)}
+          {lab ? lab.title : titleCase(lecture.lab)}
         </p>
         <div className="mt-2 flex gap-4 font-mono text-xs">
           {lecture.loadSlides && (

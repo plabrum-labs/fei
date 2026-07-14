@@ -7,7 +7,7 @@ export function HomePage({ lectures }: { lectures: LectureEntry[] }) {
     <main className="mx-auto max-w-3xl px-6 py-20">
       <header className="mb-20">
         <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-          A self-directed graduate seminar
+          An independent study
         </p>
         <h1 className="mt-3 font-heading text-5xl leading-[1.05] font-medium tracking-tight sm:text-6xl">
           Foundations of
@@ -30,9 +30,6 @@ export function HomePage({ lectures }: { lectures: LectureEntry[] }) {
             <section key={lab.key}>
               <div className="flex items-baseline gap-3">
                 <h2 className="font-heading text-2xl">{lab.title}</h2>
-                <span className="ml-auto font-mono text-xs tracking-wider text-muted-foreground uppercase">
-                  {lab.month}
-                </span>
               </div>
               <p className="mt-1 max-w-lg text-sm text-muted-foreground">{lab.blurb}</p>
 

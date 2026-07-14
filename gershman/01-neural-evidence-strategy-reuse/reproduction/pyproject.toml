@@ -1,0 +1,9 @@
+[project]
+name = "neural-evidence-strategy-reuse-repro"
+version = "0.1.0"
+description = "Behavioral simulation reproducing Hall-McMaster et al. 2025 gem collector task"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.11.0",
+    "numpy>=2.5.1",
+]

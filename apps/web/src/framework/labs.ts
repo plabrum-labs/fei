@@ -1,7 +1,6 @@
 export interface LabMeta {
   key: string;
   order: number;
-  month: string;
   title: string;
   blurb: string;
 }

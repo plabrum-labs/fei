@@ -1,0 +1,16 @@
+{
+  "include": ["scripts", "gershman", "hafner", "tenenbaum", "friston"],
+  "exclude": ["**/node_modules", "**/.venv", "**/dist", "apps/web"],
+  "typeCheckingMode": "standard",
+  "venvPath": ".",
+  "venv": ".venv",
+  "executionEnvironments": [
+    {
+      "root": "gershman/01-neural-evidence-strategy-reuse/reproduction",
+      "extraPaths": [
+        "gershman/01-neural-evidence-strategy-reuse/reproduction/.venv/lib/python3.13/site-packages"
+      ]
+    },
+    { "root": "." }
+  ]
+}

@@ -1,0 +1,42 @@
+import { Tex } from "@/primitives/Tex";
+import { PyRepl } from "@/primitives/PyRepl";
+import { SineDemo } from "./SineDemo";
+
+# Neural evidence that humans reuse strategies
+
+*Placeholder article for the Gershman Lab lecture — proves the MDX + math rendering
+pipeline end to end; replace with the real write-up once the reproduction lands.*
+
+## Prose math
+
+Prose math renders through the `remark-math` / `rehype-katex` pipeline already wired
+into `vite.config.ts` — no explicit component needed. For example, the softmax policy
+used in the paper is $\pi(a \mid s) \propto \exp(Q(s, a) / \tau)$, where $\tau$ is an
+inverse-temperature parameter controlling exploration.
+
+## Component math
+
+The `<Tex>` primitive renders the same expressions from a variable or computed string,
+for cases where the expression isn't static prose:
+
+<Tex expr="\pi(a \mid s) \propto \exp(Q(s, a) / \tau)" block />
+
+Both paths should render identically — the difference is only where the expression
+comes from (static prose vs. a component prop).
+
+## Runnable Python
+
+The `<PyRepl>` primitive runs real Python in the browser via
+[Pyodide](https://pyodide.org) — no backend, no build step. Edit the code and press
+Run:
+
+<PyRepl code={"import sys\nprint(sys.version)\nfor i in range(5):\n    print(i ** 2)"} />
+
+## Python-driven interactivity
+
+Sliders don't have to just plug numbers into a JS formula — they can drive a Python
+computation (with numpy, scipy, etc.) that redraws a plot. Here the frequency slider
+is passed as a keyword argument into a `compute(freq)` function that returns points
+which get rendered through `<PlotLayer>`:
+
+<SineDemo />
