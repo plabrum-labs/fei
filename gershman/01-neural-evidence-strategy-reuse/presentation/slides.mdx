@@ -1,26 +1,270 @@
 import { Tex } from "@/primitives/Tex";
+import { GemCollector, GemIcon } from "./components/GemCollector";
+import { ChoiceProfile, ReuseDial } from "./components/SimulationView";
+import { GEMS } from "./components/taskData";
+
+export const Slide = ({ kicker, children }) => (
+  <section className="flex h-full w-full flex-col items-center justify-center gap-6 p-12 text-center">
+    {kicker && (
+      <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">{kicker}</p>
+    )}
+    {children}
+  </section>
+);
+
+export const WideSlide = ({ kicker, children }) => (
+  <section className="flex h-full w-full flex-col items-center justify-center gap-4 p-8">
+    {kicker && (
+      <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">{kicker}</p>
+    )}
+    <div className="max-h-[82vh] w-full max-w-3xl overflow-y-auto">{children}</div>
+  </section>
+);
 
 export const slides = [
-  <section className="flex h-full w-full flex-col items-center justify-center gap-4 p-12">
-    <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">
-      Samuel Gershman Lab
-    </p>
-    <h1 className="max-w-3xl text-center text-5xl font-medium">
-      Neural evidence that humans reuse strategies
+  <Slide kicker="Samuel Gershman Lab">
+    <div className="flex gap-3">
+      {GEMS.map((gem) => (
+        <GemIcon key={gem.name} gem={gem} size={28} />
+      ))}
+    </div>
+    <h1 className="max-w-3xl text-5xl font-medium">
+      Neural evidence that humans reuse strategies to solve new tasks
     </h1>
-    <p className="font-mono text-sm text-muted-foreground italic">Placeholder deck</p>
-  </section>,
-  <section className="flex h-full w-full flex-col items-center justify-center gap-4 p-12">
-    <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">The question</p>
-    <p className="max-w-2xl text-center text-3xl leading-snug">
-      Do people reuse previously learned control strategies rather than relearning
-      from scratch in each new task?
+    <p className="font-mono text-sm text-muted-foreground">
+      Hall-McMaster, Tomov, Gershman &amp; Schuck · PLoS Biology 2025
     </p>
-  </section>,
-  <section className="flex h-full w-full flex-col items-center justify-center gap-4 p-12">
-    <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">
-      A policy, formally
+  </Slide>,
+
+  <Slide kicker="The question">
+    <p className="max-w-2xl text-3xl leading-snug">
+      Facing a genuinely new task, do people <em>recompute</em> the best plan — or
+      <em> reuse</em> a solution that worked before?
     </p>
-    <Tex expr="\pi(a \mid s) \propto \exp(Q(s, a) / \tau)" block />
-  </section>,
+  </Slide>,
+
+  <Slide kicker="Three strategies, one frontier">
+    <div className="grid max-w-4xl grid-cols-1 gap-4 text-left sm:grid-cols-3">
+      <div className="rounded-lg border border-border p-4">
+        <p className="font-medium">Model-free</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Repeat cached values. Cheap, but blind when the reward changes.
+        </p>
+      </div>
+      <div className="rounded-lg border border-border p-4">
+        <p className="font-medium">Model-based</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Recompute every option from a full model. Optimal, expensive, nothing reused.
+        </p>
+      </div>
+      <div className="rounded-lg border border-accent bg-accent/5 p-4">
+        <p className="font-medium">SF&amp;GPI</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Re-score a small library of past-optimal policies. Cheap <em>and</em> near-optimal
+          — when the library fits.
+        </p>
+      </div>
+    </div>
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Points on an accuracy–compute frontier. Only SF&amp;GPI reuses whole solutions.
+    </p>
+  </Slide>,
+
+  <Slide kicker="The gem collector">
+    <p className="max-w-2xl text-2xl leading-snug">
+      Four cities, each with a fixed stock of three gem shapes. The market prices the
+      shapes; selling pays stock times price.
+    </p>
+    <Tex expr="r = \boldsymbol{\phi} \cdot \mathbf{w}" block />
+    <p className="max-w-xl text-lg text-muted-foreground">
+      Gem stocks <Tex expr="\boldsymbol{\phi}" /> are reusable structure. Prices{" "}
+      <Tex expr="\mathbf{w}" /> change every task.
+    </p>
+  </Slide>,
+
+  <Slide kicker="Training design">
+    <p className="max-w-2xl text-2xl leading-snug">
+      Four price lists, <span className="text-accent">with feedback</span>. The prices are
+      rigged so <strong>City 1 and City 4 are best on every training task</strong>.
+    </p>
+    <p className="max-w-xl text-lg text-muted-foreground">
+      A learner leaves training with two trusted policies: sell in City 1, or sell in
+      City 4.
+    </p>
+  </Slide>,
+
+  <WideSlide kicker="Play it">
+    <GemCollector />
+  </WideSlide>,
+
+  <Slide kicker="The twist">
+    <p className="max-w-2xl text-2xl leading-snug">
+      Test posts <strong>new prices, no feedback</strong> — and flips the ranking. Cities 2
+      and 3 are now objectively best.
+    </p>
+    <div className="grid max-w-2xl grid-cols-2 gap-4 text-left">
+      <div className="rounded-lg border border-indigo-500/40 p-4">
+        <p className="font-medium">Model-based</p>
+        <p className="mt-1 text-sm text-muted-foreground">Switches to City 2 / City 3.</p>
+      </div>
+      <div className="rounded-lg border border-accent/50 p-4">
+        <p className="font-medium">SF&amp;GPI</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Stays on City 1 / City 4 — not in its library, can&rsquo;t select them.
+        </p>
+      </div>
+    </div>
+    <p className="text-lg text-muted-foreground">
+      And the temptation to switch is tiny: only <strong>\$10–\$20</strong>.
+    </p>
+  </Slide>,
+
+  <Slide kicker="What people did">
+    <div className="flex flex-wrap justify-center gap-10">
+      <div>
+        <div className="font-mono text-5xl font-medium">82.9%</div>
+        <div className="mt-2 text-sm text-muted-foreground">optimal at training</div>
+      </div>
+      <div>
+        <div className="font-mono text-5xl font-medium text-accent">68.8%</div>
+        <div className="mt-2 text-sm text-muted-foreground">reused at test</div>
+      </div>
+      <div>
+        <div className="font-mono text-5xl font-medium">92.9%</div>
+        <div className="mt-2 text-sm text-muted-foreground">better of the two reused</div>
+      </div>
+    </div>
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Reuse, not recomputation — and the 92.9% rules out blind habit.
+    </p>
+  </Slide>,
+
+  <WideSlide kicker="Where the choices go">
+    <ChoiceProfile />
+  </WideSlide>,
+
+  <Slide kicker="The model">
+    <p className="max-w-2xl text-2xl leading-snug">One softmax, three plug-ins.</p>
+    <Tex expr="\pi(a) \propto \exp\!\big(\beta \, Q(a)\big)" block />
+    <ul className="max-w-2xl space-y-1 text-left text-lg text-muted-foreground">
+      <li>
+        <strong className="text-foreground">MB</strong> — score all cities at new prices.
+      </li>
+      <li>
+        <strong className="text-foreground">MF</strong> — score by cached training reward.
+      </li>
+      <li>
+        <strong className="text-foreground">SF&amp;GPI</strong> — score only the learned
+        library, with a small lapse to full recomputation.
+      </li>
+    </ul>
+  </Slide>,
+
+  <Slide kicker="GPI + successor features">
+    <p className="max-w-2xl text-xl text-muted-foreground">
+      Generalized policy improvement: re-score the best stored policy under new weights.
+    </p>
+    <Tex
+      expr="a^\star = \arg\max_{a \in \{\phi_1,\ \phi_4\}}\ \boldsymbol{\phi}(a)\cdot\mathbf{w}"
+      block
+    />
+    <p className="max-w-2xl text-xl text-muted-foreground">
+      Cheap because value factorizes — and one step deep,{" "}
+      <Tex expr="\boldsymbol{\psi} = \boldsymbol{\phi}" />:
+    </p>
+    <Tex expr="Q^{\pi}(a) = \boldsymbol{\psi}^{\pi}(a)\cdot\mathbf{w}" block />
+  </Slide>,
+
+  <WideSlide kicker="Re-run it live">
+    <ReuseDial />
+  </WideSlide>,
+
+  <Slide kicker="Into the brain">
+    <p className="max-w-2xl text-xl leading-snug">
+      Decoders trained on training-feedback choices, applied to test time-courses across
+      four ROIs.
+    </p>
+    <div className="w-full max-w-2xl overflow-x-auto">
+      <table className="w-full border-collapse text-left text-sm">
+        <thead>
+          <tr className="border-b border-border font-mono text-xs text-muted-foreground uppercase">
+            <th className="py-2 pr-3 font-normal">Prediction</th>
+            <th className="py-2 pr-3 font-normal">OTC</th>
+            <th className="py-2 pr-3 font-normal">DLPFC</th>
+            <th className="py-2 pr-3 font-normal">MTL</th>
+            <th className="py-2 font-normal">OFC</th>
+          </tr>
+        </thead>
+        <tbody className="font-medium">
+          <tr className="border-b border-border/60">
+            <td className="py-2 pr-3 font-normal">Policies reactivate</td>
+            <td className="py-2 pr-3 text-emerald-600 dark:text-emerald-400">✓</td>
+            <td className="py-2 pr-3 text-emerald-600 dark:text-emerald-400">✓</td>
+            <td className="py-2 pr-3 text-muted-foreground">—</td>
+            <td className="py-2 text-muted-foreground">—</td>
+          </tr>
+          <tr className="border-b border-border/60">
+            <td className="py-2 pr-3 font-normal">Prioritized over best</td>
+            <td className="py-2 pr-3 text-emerald-600 dark:text-emerald-400">✓✓</td>
+            <td className="py-2 pr-3 text-emerald-600 dark:text-emerald-400">✓</td>
+            <td className="py-2 pr-3 text-muted-foreground">—</td>
+            <td className="py-2 text-emerald-600 dark:text-emerald-400">✓</td>
+          </tr>
+          <tr>
+            <td className="py-2 pr-3 font-normal">Features reactivate</td>
+            <td className="py-2 pr-3 text-muted-foreground">—</td>
+            <td className="py-2 pr-3 text-muted-foreground">—</td>
+            <td className="py-2 pr-3 text-muted-foreground">—</td>
+            <td className="py-2 text-muted-foreground">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Whole policies return — their gem features do not.
+    </p>
+  </Slide>,
+
+  <Slide kicker="Brain ↔ behavior">
+    <p className="max-w-2xl text-2xl leading-snug">
+      OTC decoding of the better training policy tracked how often a person reused it.
+    </p>
+    <Tex expr="\rho = 0.45" block />
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      OTC carried it early (~5 s, pre-response); DLPFC later (~8.75 s). More OTC reuse
+      signal meant <em>less</em> model-based choice.
+    </p>
+  </Slide>,
+
+  <Slide kicker="Cracks">
+    <ul className="max-w-2xl space-y-2 text-left text-lg text-muted-foreground">
+      <li>
+        A <strong className="text-foreground">UVFA</strong> signature surfaces on the one
+        near-tie test task — reuse is dominant, not exclusive.
+      </li>
+      <li>
+        Full vs partial reuse splits the participants into two subgroups.
+      </li>
+      <li>
+        One step deep, SF&amp;GPI can&rsquo;t be separated from a{" "}
+        <strong className="text-foreground">noisy-memory model-based</strong> account.
+      </li>
+      <li>
+        The single-feature heuristic is ruled out by decoding of the <em>less</em>-rewarding
+        policy.
+      </li>
+    </ul>
+  </Slide>,
+
+  <Slide kicker="Where it sits">
+    <p className="max-w-3xl text-xl leading-snug">
+      Successor representation (Dayan 1993) → predictive maps (Stachenfeld et al. 2017) →
+      SF&amp;GPI for transfer (Barreto et al. 2017) → SF&amp;GPI in humans (Tomov, Schulz &amp;
+      Gershman 2021) → <strong className="text-foreground">its neural basis, here</strong>.
+    </p>
+    <p className="max-w-2xl text-2xl leading-snug text-accent">
+      Reuse structure instead of recomputing it — the efficient-intelligence bargain, caught
+      in the act.
+    </p>
+  </Slide>,
 ];

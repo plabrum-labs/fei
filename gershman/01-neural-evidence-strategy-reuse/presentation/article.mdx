@@ -1,42 +1,249 @@
 import { Tex } from "@/primitives/Tex";
-import { PyRepl } from "@/primitives/PyRepl";
-import { SineDemo } from "./SineDemo";
+import { Callout } from "@/primitives/typography";
+import { GemCollector } from "./components/GemCollector";
+import { ChoiceProfile, ReuseDial } from "./components/SimulationView";
 
-# Neural evidence that humans reuse strategies
+# Neural evidence that humans reuse strategies to solve new tasks
 
-*Placeholder article for the Gershman Lab lecture — proves the MDX + math rendering
-pipeline end to end; replace with the real write-up once the reproduction lands.*
+<div className="font-mono text-sm text-muted-foreground">
+  Hall-McMaster, Tomov, Gershman &amp; Schuck (2025). <em>PLoS Biology</em> 23(6): e3003174.
+</div>
 
-## Prose math
+When a task you have never seen shares its structure with tasks you have, you have three
+options. You can fall back on habit. You can build a fresh plan from a full model of the
+new situation. Or you can reach for a solution that worked before and check whether it
+still pays. This paper argues — from behavior and from fMRI — that people do the third
+thing, and it localizes the reused solutions to activity in visual and prefrontal cortex.
+The claim is not just that reuse happens, but that a specific algorithm,
+**successor features with generalized policy improvement (SF&GPI)**, captures how.
 
-Prose math renders through the `remark-math` / `rehype-katex` pipeline already wired
-into `vite.config.ts` — no explicit component needed. For example, the softmax policy
-used in the paper is $\pi(a \mid s) \propto \exp(Q(s, a) / \tau)$, where $\tau$ is an
-inverse-temperature parameter controlling exploration.
+## 1. Three ways to solve a new task
 
-## Component math
+Fix a decision problem: a set of actions, and a reward that depends on the action you take
+and on some weights that change from task to task. Three strategies span most of what an
+agent could do.
 
-The `<Tex>` primitive renders the same expressions from a variable or computed string,
-for cases where the expression isn't static prose:
+**Model-free (MF)** caches the value of each action from past experience and repeats
+whatever paid best. It is cheap and it needs no model of the world, but it does not
+generalize: when the weights change, its cached values are simply wrong, and it has no way
+to notice.
 
-<Tex expr="\pi(a \mid s) \propto \exp(Q(s, a) / \tau)" block />
+**Model-based (MB)** holds a full model of the environment and, for each new task,
+recomputes the expected reward of every available action from scratch. It is always
+optimal in principle. It is also the most expensive option, because the work scales with
+the size of the problem and none of it is reused.
 
-Both paths should render identically — the difference is only where the expression
-comes from (static prose vs. a component prop).
+**SF&GPI** sits between them. The agent keeps a small library of *policies* — whole
+solutions — that were optimal on earlier tasks. Facing a new task, it does not recompute
+over the entire environment; it evaluates only the stored policies under the new reward
+and takes the best of them. Two ideas make this cheap. **Successor features (SF)**
+factorize an action's value into task-independent *features* and task-specific *weights*,
+so re-scoring an old policy under new weights is a dot product rather than a fresh
+computation. **Generalized policy improvement (GPI)** is the rule for combining the
+library: evaluate every stored policy under the new weights and act greedily with respect
+to the best one.
 
-## Runnable Python
+The three strategies are points on an accuracy–compute frontier: MF is cheap and brittle,
+MB is accurate and expensive, SF&GPI is a near-optimal shortcut *when the library already
+contains a good policy*. The distinguishing prediction is sharp. Because SF&GPI can only
+reuse policies that were **optimal during training**, it is structurally unable to select a
+solution that was never good before — exactly what a full model-based agent does whenever
+the newly-best action is one training never rewarded. The experiment is built to force that
+distinction into the open.
 
-The `<PyRepl>` primitive runs real Python in the browser via
-[Pyodide](https://pyodide.org) — no backend, no build step. Edit the code and press
-Run:
+## 2. The gem collector
 
-<PyRepl code={"import sys\nprint(sys.version)\nfor i in range(5):\n    print(i ** 2)"} />
+Participants play a trading game. There are four cities; each city holds a fixed stock of
+three gem shapes — a triangle, a square, a circle. Each round the market posts a price per
+shape (the weights <Tex expr="\mathbf{w}" />, ranging from −\$2 to \$2), and selling in a
+city pays the city's gem stock times those prices. Writing a city's gem counts as its
+feature vector <Tex expr="\boldsymbol{\phi}" />, the profit for choosing that city is a
+single dot product:
 
-## Python-driven interactivity
+<Tex expr="r = \boldsymbol{\phi} \cdot \mathbf{w} = \sum_{g}\ \phi_g\, w_g" block />
 
-Sliders don't have to just plug numbers into a JS formula — they can drive a Python
-computation (with numpy, scipy, etc.) that redraws a plot. Here the frequency slider
-is passed as a keyword argument into a `compute(freq)` function that returns points
-which get rendered through `<PlotLayer>`:
+The gem stocks <Tex expr="\boldsymbol{\phi}" /> are the reusable structure — they are fixed
+within a block. The prices <Tex expr="\mathbf{w}" /> are what changes from task to task. In
+the **training** phase, participants see four price lists *with feedback*, and the prices
+are chosen so that two of the four cities — call them City 1 and City 4 — are the best
+choice on every training task. The other two are never worth selling in. Over training, a
+learner should come away with two good policies: "sell in City 1" and "sell in City 4."
 
-<SineDemo />
+Play it. Train on the four price lists, then take the test — and notice what you do when
+the feedback stops.
+
+<GemCollector />
+
+## 3. The twist that splits the hypotheses
+
+The test phase posts four price lists nobody has seen, and it withholds feedback. The
+prices are engineered to **flip the ranking**: the two cities that training never rewarded,
+City 2 and City 3, are now the objectively best-paying options. A full model-based agent,
+recomputing <Tex expr="\boldsymbol{\phi}\cdot\mathbf{w}" /> for all four cities, switches to
+them immediately. An SF&GPI agent cannot: City 2 and City 3 are not in its library, so it
+stays among the previously-optimal cities and picks whichever of City 1 or City 4 pays more
+now.
+
+The design makes the two accounts disagree on every test task while keeping the temptation
+to switch deliberately small. The objectively best city out-earns the better reused city by
+only \$10–\$20:
+
+| Test prices (△ / □ / ○) | Objective best (MB) | Best reuse (C1 / C4) | Gap |
+| --- | --- | --- | --- |
+| +2 / −1 / −1 | City 3 = \$90 | City 1 = \$80 | \$10 |
+| −1 / +1 / +1 | City 2 = \$180 | City 4 = \$160 | \$20 |
+| +1 / −1 / +1 | City 2 = \$200 | City 1 = \$180 | \$20 |
+| +1 / +1 / −1 | City 3 = \$250 | City 4 = \$240 | \$10 |
+
+<Callout>
+  Because the gap is small, both accounts predict *good* earnings — the question is never
+  who makes money, but **which option a chooser reaches for first**: the newly-best city it
+  would have to recompute, or the good-enough city it already trusts.
+</Callout>
+
+That small gap matters for interpretation. If reuse only appeared when recomputing was
+expensive relative to a large payoff, it would look like ordinary cost-cutting. Here
+switching costs almost nothing and still mostly does not happen.
+
+## 4. What people did
+
+Across 38 participants (six blocks of 68 trials, with real money at stake), the behavior
+lands squarely on the reuse side. Training was learned well — 82.9% optimal choices, far
+above the 50% chance rate. At test, **68.8%** of choices stayed within the two
+previously-optimal cities, even though switching paid more; and among those reuse choices,
+the more-rewarding of the two was picked **92.9%** of the time. That second number is what
+rules out mere habit: model-free perseveration would keep choosing City 1 and City 4 but
+would have no way to pick the better of them under prices it has never seen.
+
+The per-city choice profile separates all three strategies at a glance. A simulated
+model-based agent moves its mass onto Cities 2 and 3. A model-free agent stays on Cities 1
+and 4 but splits them near-randomly — high reuse, chance-level accuracy within the reused
+set. Only SF&GPI reproduces the human shape: concentrated on the reused cities *and*
+correctly ordered within them.
+
+<ChoiceProfile />
+
+## 5. How they modeled it
+
+The reproduction's `simulate.py` implements the three strategies as choice rules over the
+same softmax, and it is worth reading as the operational definition of each account. Every
+agent turns city values into a choice with the same policy,
+
+<Tex expr="\pi(a) \propto \exp\!\big(\beta \, Q(a)\big)," block />
+
+where <Tex expr="\beta" /> is an inverse-temperature (decision sharpness). What differs is
+the value <Tex expr="Q(a)" /> each agent plugs in, and the set of cities it is willing to
+consider:
+
+- **Model-based** scores all four cities at the current weights,
+  <Tex expr="Q(a) = \boldsymbol{\phi}(a)\cdot\mathbf{w}" />, and chooses among all of them.
+- **Model-free** ignores the new weights entirely and scores each city by its *cached
+  training reward*, so it perseverates on what used to pay.
+- **SF&GPI** restricts the choice to the learned library — City 1 and City 4 — and scores
+  those two under the new weights. Restriction *is* generalized policy improvement here: with a
+  library of stored policies <Tex expr="\pi_i" />, GPI acts as
+
+  <Tex expr="a^\star = \arg\max_{a \in \{\phi_1,\ \phi_4\}}\ \boldsymbol{\phi}(a)\cdot\mathbf{w}," block />
+
+  the best stored policy re-scored under the new weights. The re-scoring is cheap precisely
+  because value **factorizes** into successor features and weights,
+  <Tex expr="Q^{\pi}(a) = \boldsymbol{\psi}^{\pi}(a)\cdot\mathbf{w}" />; in this single-step
+  task the successor features collapse to the immediate features,
+  <Tex expr="\boldsymbol{\psi} = \boldsymbol{\phi}" />, so re-scoring is one dot product.
+
+Two implementation details carry weight. Real behavior is not a clean switch between
+strategies, so the SF&GPI agent **lapses**: on a fraction of trials (fit at ≈0.32) it drops
+the library restriction and evaluates all four cities like the model-based agent. And the
+task's structure is built by **rejection-sampling** the weight vectors until the intended
+cities win by a set margin — the same trick that guarantees City 1 and City 4 are optimal
+across training and that the ranking flips at test.
+
+The dial below re-runs those three rules live. Moving <Tex expr="\beta" /> sharpens or
+softens every agent's choices; moving the lapse rate slides SF&GPI between perfect reuse
+and full recomputation. At the paper's fitted values the SF&GPI bar sits on the human line
+while the other two miss it from opposite sides.
+
+<ReuseDial />
+
+## 6. Into the brain
+
+If people reuse stored policies, the reused policies should be visible in neural activity
+when a new task appears. The authors trained logistic-regression decoders on which city was
+chosen during training feedback, then applied them to the test-phase time courses, and asked
+three questions across four regions of interest: occipitotemporal cortex (OTC),
+dorsolateral prefrontal cortex (DLPFC), medial temporal lobe (MTL), and orbitofrontal
+cortex (OFC).
+
+| Prediction | OTC | DLPFC | MTL | OFC |
+| --- | --- | --- | --- | --- |
+| 1 · Old optimal policies reactivate at test | ✓ | ✓ | — | — |
+| 2 · Reactivated *over* the objective-best option | ✓ (strongest) | ✓ | — | ✓ |
+| 3 · Underlying gem features reactivate | — | — | — | — |
+
+Three findings stand out. First, the previously-optimal policies were decoded above chance
+at test in OTC and DLPFC — the reused solutions really do come back online. Second, they
+were decoded *more strongly than the objectively-best but never-reinforced option*, the
+neural counterpart of the behavioral bias toward reuse. Third, the **features** underlying
+those policies — the gem counts — could not be decoded above chance anywhere. What returns
+is the whole policy, not its components.
+
+Timing sharpens the interpretation. OTC carried policy information early, from about 5 s
+after the cue and even at response-phase onset — early enough to reflect reactivation from
+memory rather than attention to the response screen. DLPFC evidence emerged later (≈8.75 s),
+more consistent with selection at response time. And the regions play different roles for
+behavior: the strength of OTC decoding for the more-rewarding training policy tracked how
+often a participant actually reused it (Spearman <Tex expr="\rho = 0.45" />), and OTC
+decoding was *negatively* related to model-based choice. DLPFC showed no such correlation.
+That OTC — visual cortex — should carry a reward-history-biased policy signal is the
+paper's most surprising localization, and it echoes work tying OTC replay to the formation
+of successor-like representations.
+
+## 7. Cracks and alternatives
+
+The account is not airtight, and the paper is candid about where it bends.
+
+**A residual UVFA signature.** On one test task — prices +1 / +1 / −1, where City 3 and
+City 4 pay almost the same — individual choices split in a way pure SF&GPI does not predict,
+consistent with a universal value-function-approximation (UVFA) strategy that generalizes by
+similarity between task cues rather than by re-scoring stored policies. Reuse is the dominant
+mode, not the only one.
+
+**Two subgroups.** About half the participants showed full SF&GPI recapitulation and half a
+partial version, so the population estimate averages over real heterogeneity.
+
+**Single-step ambiguity.** Because the task is one step deep, successor features collapse to
+immediate features, so this design cannot separate genuine multi-step SF&GPI from a
+partial-model account. Nor can it fully exclude a model-based agent working from *noisy or
+partial memory* of the environment — which would also under-switch. Suggestively, worse
+memory for the suboptimal cities' gem counts went with *more* reuse, exactly what a
+noisy-model fallback predicts.
+
+**Why not a simpler heuristic?** "Just chase the single highest-priced gem" is ruled out by
+the neural data rather than the behavior: a one-feature heuristic would not predict that the
+*less*-rewarding of the two training policies is decoded at test, yet OTC carried it.
+
+**A methodological caveat on the null.** The absent feature decoding (prediction 3) could
+mean features truly were not reused — or that the localizer-to-task decoder transfer was too
+weak to detect them. The paper reads it as the former but flags the latter.
+
+## 8. Where this sits
+
+The lineage is clean. The **successor representation** (Dayan, 1993) proposed caching
+*where behavior tends to go* rather than raw values, so that changing rewards need not
+trigger full relearning; Stachenfeld et al. (2017) recast the hippocampal map in those
+terms. **Successor features with GPI** (Barreto and colleagues, 2017) turned the idea into a
+transfer algorithm for reinforcement learning — factorize value, keep a policy library,
+re-score and improve. Tomov, Schulz & Gershman (2021) showed humans behave as SF&GPI
+predicts across multi-task decisions; this paper supplies the missing neural evidence, and
+does so with a design sharp enough to separate reuse from recomputation.
+
+For this curriculum the paper is a keystone. It is a concrete, measured instance of the
+efficiency thesis running through the whole study: intelligence that is expensive to run
+buys cheapness by **reusing structure** instead of recomputing it. The next lectures in this
+lab make the compression explicit — policy compression under an information bottleneck
+(02–04) asks how small a policy can get before behavior degrades, and key-value memory in
+the brain (05) asks how a library of past solutions is stored and addressed. World models
+and bilevel planning (06), and the Friston and Hafner labs alongside, occupy neighboring
+points on the same accuracy–compute frontier — different bargains between what an agent
+stores, what it recomputes, and what it is willing to get slightly wrong. SF&GPI is one such
+bargain, and this paper is the rare case where we can watch the brain strike it.

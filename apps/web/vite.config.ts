@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
@@ -11,7 +12,7 @@ const workspaceRoot = fileURLToPath(new URL("../..", import.meta.url));
 export default defineConfig({
   plugins: [
     mdx({
-      remarkPlugins: [remarkMath],
+      remarkPlugins: [remarkGfm, remarkMath],
       rehypePlugins: [rehypeKatex],
       providerImportSource: "@mdx-js/react",
     }),

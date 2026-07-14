@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "nSubjects": 100,
+    "beta": 3.0,
+    "lapse": 0.32,
+    "seed": 0,
+    "source": "gershman/01-neural-evidence-strategy-reuse/reproduction/src/generate_results.py",
+    "note": "Per-city profiles are choice frequencies from a 100-subject Monte-Carlo over randomized gem features; cities are 1-indexed in the UI (index 0 = city 1). Human bars are reconstructed from the paper's reported aggregate reuse rate under the task's city-1/city-4 symmetry."
+  },
+  "reuseSet": [
+    0,
+    3
+  ],
+  "mbOptimalSet": [
+    1,
+    2
+  ],
+  "paper": {
+    "trainOptimal": 82.9,
+    "reuse": 68.8,
+    "correctWithinReuse": 92.9
+  },
+  "trainOptimalSim": 97.6,
+  "agents": {
+    "mf": {
+      "label": "Model-free",
+      "reuse": 97.2,
+      "correctWithinReuse": 24.9,
+      "cityProfile": [
+        50.5,
+        0.8,
+        2.0,
+        46.8
+      ]
+    },
+    "mb": {
+      "label": "Model-based",
+      "reuse": 1.5,
+      "correctWithinReuse": 33.3,
+      "cityProfile": [
+        1.2,
+        54.2,
+        44.2,
+        0.2
+      ]
+    },
+    "sfgpi": {
+      "label": "SF&GPI",
+      "reuse": 68.2,
+      "correctWithinReuse": 89.0,
+      "cityProfile": [
+        37.8,
+        16.2,
+        15.5,
+        30.5
+      ]
+    }
+  },
+  "human": {
+    "label": "Human (paper)",
+    "reuse": 68.8,
+    "correctWithinReuse": 92.9,
+    "cityProfile": [
+      34.4,
+      15.6,
+      15.6,
+      34.4
+    ],
+    "reconstructed": true
+  }
+}

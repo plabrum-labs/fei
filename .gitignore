@@ -3,6 +3,8 @@ dist/
 .DS_Store
 .playwright-mcp/
 .venv/
+__pycache__/
+*.pyc
 
 # Terraform
 .terraform/
