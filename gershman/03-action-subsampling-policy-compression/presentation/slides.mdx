@@ -1,0 +1,36 @@
+import { Tex } from "@/primitives/Tex";
+
+export const Slide = ({ kicker, children }) => (
+  <section className="flex h-full w-full flex-col items-center justify-center gap-6 p-12 text-center">
+    {kicker && (
+      <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">{kicker}</p>
+    )}
+    {children}
+  </section>
+);
+
+export const WideSlide = ({ kicker, children }) => (
+  <section className="flex h-full w-full flex-col items-center justify-center gap-4 p-8">
+    {kicker && (
+      <p className="font-mono text-xs tracking-[0.2em] text-accent uppercase">{kicker}</p>
+    )}
+    <div className="max-h-[82vh] w-full max-w-3xl overflow-y-auto">{children}</div>
+  </section>
+);
+
+{/* Scaffold. Build the deck once the article is drafted. Mirror the slide/WideSlide
+    pattern and interactive components used in
+    ../../01-neural-evidence-strategy-reuse/presentation/slides.mdx. */}
+
+export const slides = [
+  <Slide kicker="Samuel Gershman Lab">
+    <h1 className="text-4xl font-semibold">Action subsampling supports policy compression</h1>
+    <p className="text-lg text-muted-foreground">Liu &amp; Gershman (2025) · PLoS Comput Biol</p>
+  </Slide>,
+
+  <Slide kicker="The problem">
+    <h2 className="text-3xl font-semibold">Too many actions to score</h2>
+  </Slide>,
+
+  // ... build out the deck here
+];
