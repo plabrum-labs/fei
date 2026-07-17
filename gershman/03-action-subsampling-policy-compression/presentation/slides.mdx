@@ -1,4 +1,8 @@
 import { Tex } from "@/primitives/Tex";
+import { BanditTask } from "./components/BanditTask";
+import { FrontierExplorer } from "./components/FrontierExplorer";
+import { ProposalComparison } from "./components/ProposalComparison";
+import { StateGlyph } from "./components/StateGlyph";
 
 export const Slide = ({ kicker, children }) => (
   <section className="flex h-full w-full flex-col items-center justify-center gap-6 p-12 text-center">
@@ -18,19 +22,176 @@ export const WideSlide = ({ kicker, children }) => (
   </section>
 );
 
-{/* Scaffold. Build the deck once the article is drafted. Mirror the slide/WideSlide
-    pattern and interactive components used in
-    ../../01-neural-evidence-strategy-reuse/presentation/slides.mdx. */}
+export const Metric = ({ value, sub }) => (
+  <div>
+    <div className="font-mono text-4xl font-medium">{value}</div>
+    <div className="mt-2 text-sm text-muted-foreground">{sub}</div>
+  </div>
+);
 
 export const slides = [
   <Slide kicker="Samuel Gershman Lab">
-    <h1 className="text-4xl font-semibold">Action subsampling supports policy compression</h1>
-    <p className="text-lg text-muted-foreground">Liu &amp; Gershman (2025) · PLoS Comput Biol</p>
+    <div className="flex gap-3">
+      {[0, 1, 2, 3, 4, 5].map((s) => (
+        <StateGlyph key={s} state={s} size={30} />
+      ))}
+    </div>
+    <h1 className="max-w-3xl text-5xl font-medium">
+      Action subsampling supports policy compression in large action spaces
+    </h1>
+    <p className="font-mono text-sm text-muted-foreground">
+      Liu &amp; Gershman · PLoS Computational Biology 2025
+    </p>
   </Slide>,
 
-  <Slide kicker="The problem">
-    <h2 className="text-3xl font-semibold">Too many actions to score</h2>
+  <Slide kicker="The question">
+    <p className="max-w-2xl text-3xl leading-snug">
+      Real decisions hide a <em>huge</em> menu of actions. A bounded mind can&rsquo;t score
+      them all. How does it cope?
+    </p>
+    <p className="max-w-xl text-lg text-muted-foreground">
+      Two economies at once: consider <em>fewer</em> actions, and map states to them only as
+      sharply as you can afford.
+    </p>
   </Slide>,
 
-  // ... build out the deck here
+  <Slide kicker="Two knobs">
+    <div className="grid max-w-4xl grid-cols-1 gap-4 text-left sm:grid-cols-2">
+      <div className="rounded-lg border border-border p-4">
+        <p className="font-medium">Policy complexity</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          How much the policy tells you about the state, <Tex expr="I(S;A)" />. A movement{" "}
+          <em>along</em> the reward–complexity frontier.
+        </p>
+      </div>
+      <div className="rounded-lg border border-accent bg-accent/5 p-4">
+        <p className="font-medium">Consideration set Nₐ</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          How many actions you even entertain. A <em>drop below</em> the frontier — the paper&rsquo;s
+          new term.
+        </p>
+      </div>
+    </div>
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Claim: people turn both — together, near-optimally.
+    </p>
+  </Slide>,
+
+  <Slide kicker="Policy compression (lecture 02)">
+    <p className="max-w-2xl text-xl text-muted-foreground">
+      Under a capacity limit, the optimal policy is a softmax with a perseveration term:
+    </p>
+    <Tex expr="\pi^*(a \mid s) \propto \exp\!\big[\beta\, Q(s,a) + \log P^*(a)\big]" block />
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      The <Tex expr="\log P^*(a)" /> bias toward generally-frequent actions dominates when{" "}
+      <Tex expr="\beta" /> (complexity) is small. Sweep <Tex expr="\beta" /> → the frontier.
+    </p>
+  </Slide>,
+
+  <Slide kicker="The task">
+    <div className="flex gap-2">
+      {[0, 1, 2, 3, 4, 5].map((s) => (
+        <StateGlyph key={s} state={s} size={44} />
+      ))}
+    </div>
+    <p className="max-w-2xl text-2xl leading-snug">
+      6 images, 7 keys. Each image has one <strong>+1</strong> key; wrong number{" "}
+      <strong>−0.18</strong>. One <strong>safety key</strong> pays <strong>+0.2</strong> always.
+    </p>
+    <p className="max-w-xl text-lg text-muted-foreground">
+      Safety has the highest <em>general</em> value (0.2 vs ≈0.017) — so the 0-bit policy is
+      &ldquo;always press safe.&rdquo;
+    </p>
+  </Slide>,
+
+  <WideSlide kicker="Play it — mind the clock">
+    <BanditTask />
+  </WideSlide>,
+
+  <Slide kicker="The manipulation">
+    <p className="max-w-2xl text-3xl leading-snug">
+      Same rewards, three <strong>response deadlines</strong>: 0.5&nbsp;s / 1&nbsp;s / 2&nbsp;s.
+    </p>
+    <p className="max-w-xl text-lg text-muted-foreground">
+      Complexity carries a time cost. Squeeze the clock → squeeze the policy: fewer keys, more
+      safety, less reward.
+    </p>
+  </Slide>,
+
+  <Slide kicker="What people did (n = 75)">
+    <p className="max-w-2xl text-xl text-muted-foreground">Longer deadline →</p>
+    <div className="flex flex-wrap justify-center gap-8">
+      <Metric value="↑ 0.76" sub="policy complexity" />
+      <Metric value="↑ 0.25" sub="reward" />
+      <Metric value="↓ 0.31" sub="safety-key use" />
+      <Metric value="↑ 1.30" sub="distinct actions Nₐ" />
+    </div>
+    <p className="max-w-2xl text-sm text-muted-foreground">
+      All <Tex expr="p<10^{-13}" />. Complexity also predicts RT (<Tex expr="t=26.3" />,{" "}
+      <Tex expr="p<10^{-69}" />) — it really does cost time.
+    </p>
+  </Slide>,
+
+  <Slide kicker="The load-bearing result">
+    <p className="max-w-2xl text-2xl leading-snug">
+      The two knobs <strong>interact</strong>. More actions considered <em>amplify</em> the reward
+      return on complexity and <em>blunt</em> its suboptimality.
+    </p>
+    <Tex expr="R_{\text{complexity} \times N_a} = 0.671,\quad p<10^{-30}" block />
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Complexity and Nₐ climb together — spontaneously, with no instruction to do so.
+    </p>
+  </Slide>,
+
+  <WideSlide kicker="The frontier, computed">
+    <FrontierExplorer />
+  </WideSlide>,
+
+  <Slide kicker="Which actions to consider?">
+    <p className="max-w-2xl text-xl text-muted-foreground">
+      Can&rsquo;t enumerate every subset. Sample the menu from a proposal <Tex expr="P_0(a)" />:
+    </p>
+    <ul className="max-w-2xl space-y-1 text-left text-lg text-muted-foreground">
+      <li>
+        <strong className="text-foreground">Flat</strong> — uniform.
+      </li>
+      <li>
+        <strong className="text-foreground">General value</strong> —{" "}
+        <Tex expr="P_0(a)\propto V(a)" />, what people actually do.
+      </li>
+      <li>
+        <strong className="text-foreground">Oracle</strong> — sample from{" "}
+        <Tex expr="P^*(a)" />; a benchmark, not a strategy.
+      </li>
+    </ul>
+    <p className="max-w-2xl text-lg text-accent">When is the general-value heuristic optimal?</p>
+  </Slide>,
+
+  <WideSlide kicker="Simulating the heuristic">
+    <ProposalComparison />
+  </WideSlide>,
+
+  <Slide kicker="Two boundaries">
+    <p className="max-w-2xl text-2xl leading-snug">
+      General-value sampling wins <strong>only</strong> at low complexity + small Nₐ — the regime
+      humans live in.
+    </p>
+    <Tex expr="\hat\pi^*(a\mid s) \propto \sum_{j} \exp\!\big(\beta Q(s,\alpha_j)\big)\,\frac{P^*(\alpha_j)}{P_0(\alpha_j)}\,\mathbb{I}(\alpha_j=a)" block />
+    <p className="max-w-2xl text-lg text-muted-foreground">
+      Switch to <strong>SNIS</strong> (unbiased!) and the advantage vanishes. A better asymptotic
+      guarantee, a worse model of a finite mind.
+    </p>
+  </Slide>,
+
+  <Slide kicker="Where it sits">
+    <p className="max-w-3xl text-xl leading-snug">
+      Rate–distortion action selection (lecture 02) → survives <strong>large</strong> action
+      spaces by subsampling → sibling of action chunking (04) → same bargain as strategy reuse
+      (01): keep a small reusable structure, pay a little suboptimality.
+    </p>
+    <p className="max-w-2xl text-2xl leading-snug text-accent">
+      A doubly-bounded mind — coarse map, narrow menu — that manages both bounds well enough to
+      stay near optimal in a task it quietly made smaller.
+    </p>
+  </Slide>,
 ];

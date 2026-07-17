@@ -11,6 +11,12 @@
         "gershman/01-neural-evidence-strategy-reuse/reproduction/.venv/lib/python3.13/site-packages"
       ]
     },
+    {
+      "root": "gershman/03-action-subsampling-policy-compression/reproduction",
+      "extraPaths": [
+        "gershman/03-action-subsampling-policy-compression/reproduction/.venv/lib/python3.13/site-packages"
+      ]
+    },
     { "root": "." }
   ]
 }
