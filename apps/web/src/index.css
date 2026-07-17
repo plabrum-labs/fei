@@ -1,4 +1,14 @@
 @import "tailwindcss";
+
+/*
+ * Lecture content (slides, articles, diagram components) lives outside apps/web,
+ * so Tailwind's auto content-detection — rooted at the Vite project — never sees
+ * it. Any utility used *only* in a lecture file (e.g. grid-cols-3, sm:grid-cols-2)
+ * would otherwise be dropped, silently collapsing those layouts. Register the
+ * lecture presentation trees explicitly. Mirrors the glob in discoverLectures.ts.
+ */
+@source "../../../*/*/presentation/**/*.{ts,tsx,mdx}";
+
 @plugin "@tailwindcss/typography";
 @import "katex/dist/katex.min.css";
 @import "tw-animate-css";

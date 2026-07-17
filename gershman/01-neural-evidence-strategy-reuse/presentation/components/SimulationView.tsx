@@ -116,8 +116,8 @@ export function ReuseDial() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-3 rounded-lg bg-muted/40 px-4 py-3 text-sm">
+      <div className="grid items-center gap-4 sm:grid-cols-2">
+        <div className="space-y-3 self-center rounded-lg bg-muted/40 px-4 py-3 text-sm">
           <Slider label="softmax β" min={0.5} max={8} step={0.1} value={beta} onChange={setBeta} />
           <Slider label="SF&GPI lapse" min={0} max={1} step={0.01} value={lapse} onChange={setLapse} />
           <button
