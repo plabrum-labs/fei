@@ -85,34 +85,36 @@ export function FrontierExplorer() {
         </p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
-        <div>
-          <LinePlot
-            series={series}
-            dots={[...humanDots, ...marker]}
-            gap={gapValue > 0.005 ? { x: clampedC, yLow: naReward, yHigh: fullReward, color: "#ef4444", label: `−${gapValue.toFixed(2)}` } : null}
-            xDomain={[0, 2.7]}
-            yDomain={[0, 1.05]}
-            xTicks={[0, 0.5, 1, 1.5, 2, 2.5]}
-            yTicks={[0, 0.25, 0.5, 0.75, 1]}
-            xLabel="Policy complexity  I(S;A)  (bits)"
-            yLabel="Trial-averaged reward"
-            height={360}
+      {/* Plot spans the full width — it's the point of the widget; controls sit beneath it. */}
+      <div>
+        <LinePlot
+          series={series}
+          dots={[...humanDots, ...marker]}
+          gap={gapValue > 0.005 ? { x: clampedC, yLow: naReward, yHigh: fullReward, color: "#ef4444", label: `−${gapValue.toFixed(2)}` } : null}
+          xDomain={[0, 2.7]}
+          yDomain={[0, 1.05]}
+          xTicks={[0, 0.5, 1, 1.5, 2, 2.5]}
+          yTicks={[0, 0.25, 0.5, 0.75, 1]}
+          xLabel="Policy complexity  I(S;A)  (bits)"
+          yLabel="Trial-averaged reward"
+          width={920}
+          height={400}
+        />
+        <div className="mt-2">
+          <PlotLegend
+            items={[
+              { color: FULL_COLOR, label: "Full action space" },
+              { color: NA_COLOR, label: `Consideration set Nₐ = ${na}` },
+              { color: DEADLINE_COLORS[0], label: "human 0.5 s" },
+              { color: DEADLINE_COLORS[1], label: "human 1 s" },
+              { color: DEADLINE_COLORS[2], label: "human 2 s" },
+            ]}
           />
-          <div className="mt-1">
-            <PlotLegend
-              items={[
-                { color: FULL_COLOR, label: "Full action space" },
-                { color: NA_COLOR, label: `Consideration set Nₐ = ${na}` },
-                { color: DEADLINE_COLORS[0], label: "human 0.5 s" },
-                { color: DEADLINE_COLORS[1], label: "human 1 s" },
-                { color: DEADLINE_COLORS[2], label: "human 2 s" },
-              ]}
-            />
-          </div>
         </div>
+      </div>
 
-        <div className="space-y-4 rounded-lg bg-muted/40 px-4 py-3 text-sm">
+      <div className="space-y-4 rounded-lg bg-muted/40 px-4 py-3 text-sm">
+        <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
           <Slider label="actions considered  Nₐ" min={1} max={7} step={1} value={na} onChange={setNa} />
           <Slider
             label="policy complexity"
@@ -122,18 +124,18 @@ export function FrontierExplorer() {
             value={clampedC}
             onChange={setComplexity}
           />
-          <div className="space-y-1.5 border-t border-border pt-3 font-mono text-xs">
-            <Row label="attainable reward" value={naReward.toFixed(3)} />
-            <Row label="suboptimality gap" value={`−${gapValue.toFixed(3)}`} accent />
-            <Row label="max reward at this Nₐ" value={naMaxReward.toFixed(3)} />
-            <Row label="ceiling on complexity" value={`${naMaxBits.toFixed(2)} bits`} />
-          </div>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            At Nₐ = 1 the only sane action is the safety key: reward pins to 0.2 at 0 bits. Each
-            extra action lifts the ceiling and flattens the gap — so reward and Nₐ have to climb
-            together.
-          </p>
         </div>
+        <div className="grid gap-x-8 gap-y-2 border-t border-border pt-3 font-mono text-xs sm:grid-cols-2">
+          <Row label="attainable reward" value={naReward.toFixed(3)} />
+          <Row label="suboptimality gap" value={`−${gapValue.toFixed(3)}`} accent />
+          <Row label="max reward at this Nₐ" value={naMaxReward.toFixed(3)} />
+          <Row label="ceiling on complexity" value={`${naMaxBits.toFixed(2)} bits`} />
+        </div>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          At Nₐ = 1 the only sane action is the safety key: reward pins to 0.2 at 0 bits. Each
+          extra action lifts the ceiling and flattens the gap — so reward and Nₐ have to climb
+          together.
+        </p>
       </div>
 
       <p className="border-t border-border pt-3 font-mono text-[11px] leading-relaxed text-muted-foreground">

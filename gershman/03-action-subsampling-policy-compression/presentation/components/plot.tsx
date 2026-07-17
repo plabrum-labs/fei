@@ -50,9 +50,10 @@ export interface LinePlotProps {
   xLabel: string;
   yLabel: string;
   height?: number;
+  /** viewBox width; also the max CSS width the `w-full` svg renders at. */
+  width?: number;
 }
 
-const W = 660;
 const M = { top: 16, right: 18, bottom: 44, left: 52 };
 
 export function LinePlot({
@@ -66,8 +67,10 @@ export function LinePlot({
   xLabel,
   yLabel,
   height = 380,
+  width = 660,
 }: LinePlotProps) {
   const H = height;
+  const W = width;
   const iw = W - M.left - M.right;
   const ih = H - M.top - M.bottom;
 
