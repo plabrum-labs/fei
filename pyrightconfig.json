@@ -1,10 +1,17 @@
 {
-  "include": ["scripts", "gershman", "hafner", "tenenbaum", "friston"],
+  "include": ["scripts", "gershman", "hafner", "tenenbaum", "friston", "simharness"],
   "exclude": ["**/node_modules", "**/.venv", "**/dist", "apps/web"],
   "typeCheckingMode": "standard",
   "venvPath": ".",
   "venv": ".venv",
   "executionEnvironments": [
+    {
+      "root": "simharness",
+      "extraPaths": [
+        "simharness/src",
+        "simharness/.venv/lib/python3.13/site-packages"
+      ]
+    },
     {
       "root": "gershman/01-neural-evidence-strategy-reuse/reproduction",
       "extraPaths": [

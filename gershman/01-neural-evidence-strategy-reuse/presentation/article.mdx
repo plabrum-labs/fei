@@ -1,13 +1,11 @@
+---
+title: "Neural evidence that humans reuse strategies to solve new tasks"
+description: "Hall-McMaster, Tomov, Gershman & Schuck (2025). PLoS Biology 23(6): e3003174."
+---
 import { Tex } from "@/primitives/Tex";
 import { Callout } from "@/primitives/typography";
 import { GemCollector } from "./components/GemCollector";
 import { ChoiceProfile, ReuseDial } from "./components/SimulationView";
-
-# Neural evidence that humans reuse strategies to solve new tasks
-
-<div className="font-mono text-sm text-muted-foreground">
-  Hall-McMaster, Tomov, Gershman &amp; Schuck (2025). <em>PLoS Biology</em> 23(6): e3003174.
-</div>
 
 When a task you have never seen shares its structure with tasks you have, you have three
 options. You can fall back on habit. You can build a fresh plan from a full model of the
@@ -72,7 +70,7 @@ learner should come away with two good policies: "sell in City 1" and "sell in C
 Play it. Train on the four price lists, then take the test — and notice what you do when
 the feedback stops.
 
-<GemCollector />
+<GemCollector client:visible />
 
 ## 3. The twist that splits the hypotheses
 
@@ -121,7 +119,7 @@ and 4 but splits them near-randomly — high reuse, chance-level accuracy within
 set. Only SF&GPI reproduces the human shape: concentrated on the reused cities *and*
 correctly ordered within them.
 
-<ChoiceProfile />
+<ChoiceProfile client:visible />
 
 ## 5. How they modeled it
 
@@ -163,7 +161,7 @@ softens every agent's choices; moving the lapse rate slides SF&GPI between perfe
 and full recomputation. At the paper's fitted values the SF&GPI bar sits on the human line
 while the other two miss it from opposite sides.
 
-<ReuseDial />
+<ReuseDial client:visible />
 
 ## 6. Into the brain
 

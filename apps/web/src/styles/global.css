@@ -5,9 +5,10 @@
  * so Tailwind's auto content-detection — rooted at the Vite project — never sees
  * it. Any utility used *only* in a lecture file (e.g. grid-cols-3, sm:grid-cols-2)
  * would otherwise be dropped, silently collapsing those layouts. Register the
- * lecture presentation trees explicitly. Mirrors the glob in discoverLectures.ts.
+ * lecture presentation trees explicitly. Mirrors the glob in content.config.ts.
+ * (This file is one level deeper than the old index.css, hence the extra `../`.)
  */
-@source "../../../*/*/presentation/**/*.{ts,tsx,mdx}";
+@source "../../../../*/*/presentation/**/*.{ts,tsx,mdx}";
 
 @plugin "@tailwindcss/typography";
 @import "katex/dist/katex.min.css";

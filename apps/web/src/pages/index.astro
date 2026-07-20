@@ -1,0 +1,98 @@
+---
+import Base from "@/layouts/Base.astro";
+import { getLabs, getLectures, SLIDES_ENABLED } from "@/lib/content";
+
+const labs = await getLabs();
+const lectures = await getLectures();
+---
+
+<Base title="Foundations of Efficient Intelligence">
+  <main class="mx-auto max-w-3xl px-6 py-20">
+    <header class="mb-20">
+      <p class="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
+        An independent study
+      </p>
+      <h1
+        class="mt-3 font-heading text-5xl leading-[1.05] font-medium tracking-tight sm:text-6xl"
+      >
+        Foundations of
+        <br />
+        Efficient Intelligence
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+        Why is biological intelligence so computationally and sample efficient — and how do
+        we build AI systems with those properties? An interactive graduate textbook built
+        one paper, one lecture at a time, drawing on computational cognitive science,
+        neuroscience, ML, and systems.
+      </p>
+      <div class="mt-10 h-px w-full bg-border"></div>
+    </header>
+
+    <div class="space-y-14">
+      {
+        labs.map((lab) => {
+          const labLectures = lectures.filter((l) => l.lab === lab.key);
+          return (
+            <section>
+              <div class="flex items-baseline gap-3">
+                <h2 class="font-heading text-2xl">{lab.title}</h2>
+              </div>
+              <p class="mt-1 max-w-lg text-sm text-muted-foreground">{lab.blurb}</p>
+
+              {labLectures.length > 0 ? (
+                <div class="mt-4 border-t border-border">
+                  {labLectures.map((lecture, i) => (
+                    <div class="group flex items-baseline justify-between gap-6 border-b border-border py-4">
+                      <div class="flex min-w-0 items-baseline gap-4">
+                        <span class="w-5 shrink-0 font-mono text-xs text-muted-foreground">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span class="truncate font-heading text-lg">{lecture.title}</span>
+                      </div>
+                      <div class="flex shrink-0 items-center gap-4 font-mono text-xs tracking-wide uppercase">
+                        {lecture.hasArticle ? (
+                          <a
+                            href={`/${lecture.path}`}
+                            class="text-muted-foreground transition-colors hover:text-accent"
+                          >
+                            Article
+                          </a>
+                        ) : (
+                          <span class="cursor-not-allowed text-muted-foreground/40">Article</span>
+                        )}
+                        {lecture.hasSlides && SLIDES_ENABLED ? (
+                          <a
+                            href={`/${lecture.path}/slides`}
+                            class="text-muted-foreground transition-colors hover:text-accent"
+                          >
+                            Slides
+                          </a>
+                        ) : (
+                          <span class="cursor-not-allowed text-muted-foreground/40">Slides</span>
+                        )}
+                        {lecture.paperUrl && (
+                          <a
+                            href={lecture.paperUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-muted-foreground transition-colors hover:text-accent"
+                          >
+                            Paper
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p class="mt-4 border-t border-dashed border-border pt-4 font-mono text-xs text-muted-foreground italic">
+                  In development.
+                </p>
+              )}
+            </section>
+          );
+        })
+      }
+    </div>
+  </main>
+</Base>

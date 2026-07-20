@@ -1,14 +1,12 @@
+---
+title: "Action subsampling supports policy compression in large action spaces"
+description: "Liu & Gershman (2025). PLoS Computational Biology 21(9): e1013444."
+---
 import { Tex } from "@/primitives/Tex";
 import { Callout } from "@/primitives/typography";
 import { BanditTask } from "./components/BanditTask";
 import { FrontierExplorer } from "./components/FrontierExplorer";
 import { ProposalComparison } from "./components/ProposalComparison";
-
-# Action subsampling supports policy compression in large action spaces
-
-<div className="font-mono text-sm text-muted-foreground">
-  Liu &amp; Gershman (2025). <em>PLoS Computational Biology</em> 21(9): e1013444.
-</div>
 
 Textbook decision experiments hand you two or three options and ask you to choose. Real life
 does not. Standing in a hardware store, planning a sentence, picking a move — the hard part is
@@ -80,7 +78,7 @@ number goes with which image, and accept a more complex, slower policy to execut
 Play a block. Learn the mapping with feedback, then take the timed test and watch which keys
 you actually reach for when the clock is short.
 
-<BanditTask />
+<BanditTask client:visible />
 
 The manipulation is the **response deadline**: 0.5&nbsp;s, 1&nbsp;s, or 2&nbsp;s. Nothing about
 the reward structure changes between blocks, only the time you have to deploy your policy.
@@ -118,7 +116,7 @@ this task. The black curve is the full-action frontier; drop to a consideration 
 <Tex expr="N_a" /> actions and the reachable frontier falls below it. Slide policy complexity to
 move along a curve; the red segment is the suboptimality gap you would pay at that point.
 
-<FrontierExplorer />
+<FrontierExplorer client:visible />
 
 Two consequences follow, both visible in the human data. First, a bigger consideration
 set **raises the ceiling**: with <Tex expr="N_a" /> actions you can reach at most
@@ -148,7 +146,7 @@ simulation below runs it on a large action space (16 states, 32 actions). Sample
 <Tex expr="N_a" /> actions from each proposal, keep the best policy over them, and plot how far
 below the full frontier you land.
 
-<ProposalComparison />
+<ProposalComparison client:visible />
 
 The heuristic earns its keep precisely in the regime humans occupy: **low policy complexity and
 small consideration sets**. There, sampling by general value lands much closer to the frontier
@@ -175,7 +173,7 @@ guarantee about the infinite-data limit is not a reason to expect a mechanism in
 
 {/* Placeholder — the skeptical read (Phase 5) fills this in. Do not pre-empt it here. */}
 
-<div className="text-muted-foreground italic">
+<div class="text-muted-foreground italic">
   A skeptical, methods-level read of the framework and the experiment — where the two
   constraints are genuinely dissociated, and where the design leans on assumptions — is the
   subject of a companion critique.

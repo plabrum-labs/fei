@@ -18,7 +18,6 @@
     }
   },
   "include": [
-    "apps/web/src/vite-env.d.ts",
     "friston/**/presentation/**/*.ts",
     "friston/**/presentation/**/*.tsx",
     "gershman/**/presentation/**/*.ts",

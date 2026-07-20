@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from "astro:content";
+import Article from "@/layouts/Article.astro";
+import { getLectures, labFor, titleCase, SLIDES_ENABLED, type LectureEntry } from "@/lib/content";
+import type { CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles", ({ data }) => !data.draft);
+  const lectures = await getLectures();
+  return articles.flatMap((article) => {
+    const lecture = lectures.find((l) => l.articleId === article.id);
+    if (!lecture) return [];
+    return [{ params: { lab: lecture.lab, slug: lecture.slug }, props: { article, lecture } }];
+  });
+}
+
+interface Props {
+  article: CollectionEntry<"articles">;
+  lecture: LectureEntry;
+}
+
+const { article, lecture } = Astro.props as Props;
+const { Content } = await render(article);
+const lab = await labFor(lecture.lab);
+---
+
+<Article
+  title={article.data.title}
+  description={article.data.description}
+  labTitle={lab ? lab.title : titleCase(lecture.lab)}
+  path={lecture.path}
+  hasSlides={lecture.hasSlides && SLIDES_ENABLED}
+  paperUrl={lecture.paperUrl}
+>
+  <Content />
+</Article>

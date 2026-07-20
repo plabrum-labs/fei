@@ -1,0 +1,62 @@
+---
+import Base from "@/layouts/Base.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  labTitle: string;
+  path: string;
+  hasSlides: boolean;
+  paperUrl?: string;
+}
+
+const { title, description, labTitle, path, hasSlides, paperUrl } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <article class="mx-auto max-w-2xl px-6 py-16">
+    <div class="mb-10">
+      <a
+        href="/"
+        class="font-mono text-xs text-muted-foreground transition-colors hover:text-accent"
+      >
+        ← Foundations of Efficient Intelligence
+      </a>
+      <p class="mt-6 font-mono text-xs tracking-[0.2em] text-accent uppercase">
+        {labTitle}
+      </p>
+      <div class="mt-2 flex gap-4 font-mono text-xs">
+        {
+          hasSlides && (
+            <a
+              href={`/${path}/slides`}
+              class="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+            >
+              View slides →
+            </a>
+          )
+        }
+        {
+          paperUrl && (
+            <a
+              href={paperUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+            >
+              Read the paper →
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    <div
+      class="prose prose-lg max-w-none font-heading prose-headings:font-heading prose-headings:font-medium prose-code:font-mono prose-pre:font-mono"
+    >
+      <h1>{title}</h1>
+      <div class="font-mono text-sm text-muted-foreground not-prose">{description}</div>
+      <slot />
+    </div>
+  </article>
+</Base>
