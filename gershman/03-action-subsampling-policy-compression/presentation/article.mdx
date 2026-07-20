@@ -16,10 +16,10 @@ often that the set of things you *could* do is enormous and nobody has written i
 with finite resources cannot score every possible action against every possible context. So it
 does two things at once: it considers only a handful of actions, and it maps situations to
 those actions only as sharply as it can afford. This paper is about how those two economies
-interact — and it shows, with a stopwatch and a bandit task, that people run both knobs at
-once, and run them close to optimally.
+interact. With a stopwatch and a bandit task, it shows that people run both knobs at once, and
+close to optimally.
 
-## 1. Two ways to spend less
+## 1. Blurring the map and shrinking the menu
 
 Fix a task: states <Tex expr="s" /> arriving with frequency <Tex expr="P(s)" />, actions
 <Tex expr="a" />, and a reward <Tex expr="Q(s,a)" /> for taking <Tex expr="a" /> in
@@ -27,7 +27,7 @@ Fix a task: states <Tex expr="s" /> arriving with frequency <Tex expr="P(s)" />,
 reward possible. A bounded agent cannot, and there are two different ways it can cut costs.
 
 The first is to **blur the map**. Instead of a precise, state-specific policy, use one that
-partly ignores the state — in the limit, one habit for everything. The cost of a policy in this
+partly ignores the state. In the limit, one habit for everything. The cost of a policy in this
 sense is exactly how much it *tells you about the state*, the mutual information between states
 and the actions they produce:
 
@@ -41,10 +41,9 @@ capacity limit <Tex expr="I^\pi(S;A) \le C" />, the reward-maximizing policy tak
 <Tex expr="\pi^*(a \mid s) \propto \exp\!\big[\beta\, Q(s,a) + \log P^*(a)\big]," block />
 
 where <Tex expr="P^*(a)=\sum_s P(s)\,\pi^*(a\mid s)" /> is the marginal action frequency and
-<Tex expr="\beta" /> rises with the capacity <Tex expr="C" />. The second term is the tell.
-Unlike a plain softmax, the optimal compressed policy is biased toward actions that are
-*generally* frequent — a built-in **perseveration** that dominates when <Tex expr="\beta" /> is
-small. Sweeping <Tex expr="\beta" /> and solving for <Tex expr="\pi^*" /> (the Blahut–Arimoto
+<Tex expr="\beta" /> rises with the capacity <Tex expr="C" />. That second term is what a plain
+softmax lacks: it biases the optimal compressed policy toward actions that are *generally*
+frequent, a built-in **perseveration** that dominates when <Tex expr="\beta" /> is small. Sweeping <Tex expr="\beta" /> and solving for <Tex expr="\pi^*" /> (the Blahut–Arimoto
 algorithm) traces a **reward–complexity frontier**: the most reward attainable at each level of
 policy complexity.
 
@@ -57,9 +56,9 @@ here it slots directly into the same machinery: drop the excluded actions' colum
 frontier and the full-action one is the price of a narrow menu.
 
 <Callout>
-  Two knobs, two kinds of cost. Policy complexity is a movement <em>along</em> the frontier;
-  a finite consideration set is a <em>drop below</em> it. The paper's whole argument is that
-  these two interact — and that people turn both together.
+  Policy complexity moves you <em>along</em> the frontier; a finite consideration set drops you
+  <em>below</em> it. The paper's whole argument is that these two interact, and that people turn
+  both together.
 </Callout>
 
 ## 2. A task where both knobs matter
@@ -71,20 +70,20 @@ worth <Tex expr="+1" />; press a wrong number and you lose <Tex expr="-0.18" />.
 **safety key** that pays a flat <Tex expr="+0.2" /> no matter the image. Miss the response
 deadline and you get <Tex expr="-1" />.
 
-That safety key is the fulcrum. Its value *averaged over states* — its **general value**
+The safety key's value *averaged over states* — its **general value**
 <Tex expr="V(a)=\sum_s P(s)\,Q(s,a)" /> — is <Tex expr="0.2" />, while any single number key
 averages just <Tex expr="(1 - 5\times0.18)/6 \approx 0.017" />. So a maximally compressed,
 zero-complexity policy — one action for everything — should be "always press safety," banking
 <Tex expr="0.2" />. To earn more you must let the state back into your policy: remember which
 number goes with which image, and accept a more complex, slower policy to execute it.
 
-Play a block. Learn the mapping with feedback, then take the timed test — and watch which keys
+Play a block. Learn the mapping with feedback, then take the timed test and watch which keys
 you actually reach for when the clock is short.
 
 <BanditTask />
 
 The manipulation is the **response deadline**: 0.5&nbsp;s, 1&nbsp;s, or 2&nbsp;s. Nothing about
-the reward structure changes between blocks — only how much time you have to deploy your policy.
+the reward structure changes between blocks, only the time you have to deploy your policy.
 If policy complexity carries a time cost (it does, in earlier work), then squeezing the deadline
 should squeeze the policy: fewer distinct keys, more reliance on safety, lower complexity, lower
 reward. The task turns an abstract capacity limit into a wall-clock one you can feel.
@@ -102,32 +101,32 @@ time: higher-complexity policies came with reliably longer response times
 (<Tex expr="0.273 \pm 0.010" />, <Tex expr="t(223)=26.3" />, <Tex expr="p<10^{-69}" />).
 
 The load-bearing result is the **interaction** between the two knobs. More actions considered
-did not just add reward on their own — they *amplified* the reward return on policy complexity
+did more than add reward on their own: they *amplified* the reward return on policy complexity
 (interaction <Tex expr="0.0205 \pm 0.003" />, <Tex expr="p<10^{-10}" />) and *blunted* the
 suboptimality that complexity otherwise incurs (interaction on reward-loss
 <Tex expr="0.0571 \pm 0.003" />, <Tex expr="p<10^{-40}" />). And the two rose together across
 people: policy complexity and <Tex expr="N_a" /> correlated at <Tex expr="R=0.671" />
 (<Tex expr="p<10^{-30}" />). Participants were not told to do any of this. Under time pressure
-they spontaneously simplified the task — considering fewer actions, mapping them more crudely —
+they spontaneously simplified the task, considering fewer actions and mapping them more crudely,
 and relaxed that simplification when the clock allowed.
 
 ## 4. The frontier, and where people sit on it
 
-Because the task's reward structure is fully known, the frontier is not a metaphor here — it is
-computable. The widget below is the actual output of the reproduction's Blahut–Arimoto engine on
+Because the task's reward structure is fully known, the frontier here is computable, not a
+metaphor. The widget below is the actual output of the reproduction's Blahut–Arimoto engine on
 this task. The black curve is the full-action frontier; drop to a consideration set of
 <Tex expr="N_a" /> actions and the reachable frontier falls below it. Slide policy complexity to
 move along a curve; the red segment is the suboptimality gap you would pay at that point.
 
 <FrontierExplorer />
 
-Two structural facts fall out, and both show up in the human data. First, a bigger consideration
+Two consequences follow, both visible in the human data. First, a bigger consideration
 set **raises the ceiling**: with <Tex expr="N_a" /> actions you can reach at most
 <Tex expr="\log_2 N_a" /> bits, so more actions are a precondition for a more rewarding policy.
 Second, a bigger consideration set **flattens the gap**: each extra bit of complexity is spent
 more efficiently when more actions are on the table. Together they explain why complexity and
-<Tex expr="N_a" /> have to climb *together* — raising one without the other leaves reward on the
-table — which is exactly the positive correlation the participants show. The human means (the
+<Tex expr="N_a" /> have to climb *together*: raising one without the other leaves reward on the
+table, which is exactly the positive correlation the participants show. The human means (the
 colored dots, one per deadline) sit below the full frontier, in the region the framework
 attributes to finite consideration sets, and march up-and-right as the deadline loosens.
 
@@ -156,9 +155,9 @@ small consideration sets**. There, sampling by general value lands much closer t
 than flat sampling, because at low complexity the optimal policy wants the single
 highest-general-value action anyway — so a proposal biased toward high general value is likely to
 contain it. Push either knob up — more complexity, more actions — and the edge fades, as
-state-specific value decouples from general value. This is the payoff of the whole framing: it
-turns a descriptive quirk ("people over-sample generally-good options") into a *conditional
-optimality* claim with sharp boundaries.
+state-specific value decouples from general value. That turns a descriptive quirk ("people
+over-sample generally-good options") into a *conditional-optimality* claim with sharp
+boundaries.
 
 The boundaries cut the other way too. Swap the downstream algorithm from Blahut–Arimoto to
 **self-normalized importance sampling** (SNIS), which corrects the proposal's bias to
@@ -167,9 +166,9 @@ approximate the full-space policy without distortion,
 <Tex expr="\hat\pi^*(a \mid s) \propto \sum_{j=1}^{n} \exp\!\big(\beta\,Q(s,\alpha_j)\big)\,\frac{P^*(\alpha_j)}{P_0(\alpha_j)}\,\mathbb{I}(\alpha_j = a)," block />
 
 and the general-value advantage *vanishes*. By construction SNIS discounts frequently-sampled
-actions — cancelling the very bias that made general-value sampling helpful. The lesson is
-pointed: SNIS has the *better* asymptotic guarantee (it is unbiased; Blahut–Arimoto is not), and
-it is the *worse* model of adaptive behavior in the small-sample regime people live in. A
+actions, cancelling the very bias that made general-value sampling helpful. SNIS has the
+*better* asymptotic guarantee (it is unbiased; Blahut–Arimoto is not), yet it is the *worse*
+model of adaptive behavior in the small-sample regime people live in. A
 guarantee about the infinite-data limit is not a reason to expect a mechanism in a finite mind.
 
 ## 6. Cracks and alternatives
@@ -199,7 +198,7 @@ Here the reusable, amortized object is a **proposal distribution** — a general
 actions, learned once and applied across tasks — rather than a policy library, but the bargain is
 the same one the whole study circles: keep a small, reusable structure and pay a little
 suboptimality, instead of solving each problem in full. The wider lineage the paper draws on is
-explicit in its own text — rate–distortion theory of cognition (Sims), resource-rational analysis
+explicit in its own text: rate–distortion theory of cognition (Sims), resource-rational analysis
 (Lieder &amp; Griffiths), the option-generation literature (Morris, Phillips, Cushman), and
 sampling-as-cognition (importance sampling for concept learning, reinforcement learning, and
 parsing).
