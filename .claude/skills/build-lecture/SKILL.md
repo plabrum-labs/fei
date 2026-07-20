@@ -65,7 +65,8 @@ Under `<lab>/<NN-slug>/reproduction/`:
 ## Phase 3 — Write the interactive article
 
 `<lab>/<NN-slug>/presentation/article.mdx`, imported by `apps/web`'s framework
-(`discoverLectures.ts` globs `*/*/presentation/article.mdx`) — folder name must be
+(Astro's content layer globs `*/*/presentation/article.mdx` in
+`apps/web/src/content.config.ts`) — folder name must be
 `NN-slug` (numeric prefix + kebab-case), which becomes the URL slug with the prefix stripped.
 
 Available primitives (`apps/web/src/primitives/`): `Tex` (KaTeX, `expr` prop, add `block` for

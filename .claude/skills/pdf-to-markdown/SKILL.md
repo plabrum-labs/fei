@@ -15,8 +15,9 @@ before `build-lecture`, which reads `paper.md` (not the PDF) as its source.
    `<lab>/<NN-slug>/paper.pdf` (e.g. `gershman/05-key-value-memory-in-the-brain/paper.pdf`).
    If the user gives a bare PDF path not yet in this structure, ask where it belongs (which
    lab folder, what `NN-slug` name) before running anything — folder placement drives the
-   whole downstream pipeline (`discoverLectures.ts` globs `*/*/presentation/*.mdx` by this
-   same `<lab>/<NN-slug>` shape).
+   whole downstream pipeline (Astro's content layer globs `*/*/presentation/article.mdx` in
+   `apps/web/src/content.config.ts` and `*/*/paper.pdf` in `apps/web/src/lib/content.ts` by
+   this same `<lab>/<NN-slug>` shape).
 2. **Check the output doesn't already exist** (`paper.md` next to `paper.pdf`). If it does,
    confirm with the user before overwriting — Marker conversion is slow (loads ML models) and
    a prior conversion may have been hand-edited.
